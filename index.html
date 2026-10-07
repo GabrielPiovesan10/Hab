@@ -66,6 +66,12 @@
         .sidebar-menu li:active { background: var(--border-main); }
         .sidebar-menu li i { color: #00e676; font-size: 20px; width: 25px; text-align: center; }
 
+        /* Correção do Layout do Perfil (Evita vazar a tela) */
+        .profile-li { align-items: flex-start !important; }
+        .profile-li i { margin-top: 3px; }
+        .profile-info { display: flex; flex-direction: column; overflow: hidden; width: 100%; }
+        .profile-email { font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; width: 100%; font-weight: 500; }
+
         /* ================= MODAIS ================= */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: var(--modal-overlay); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 1100; opacity: 0; pointer-events: none; transition: 0.3s ease; }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
@@ -171,7 +177,14 @@
             <button class="btn-icon" onclick="window.fecharMenu()" style="border: none;"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <ul class="sidebar-menu">
-            <li><i class="fa-solid fa-user"></i> Meu Perfil (<span id="user-display-email" style="font-size: 11px;"></span>)</li>
+            <!-- AQUI FOI CORRIGIDO O VAZAMENTO DO E-MAIL -->
+            <li class="profile-li">
+                <i class="fa-solid fa-user"></i>
+                <div class="profile-info">
+                    <span>Meu Perfil</span>
+                    <span id="user-display-email" class="profile-email"></span>
+                </div>
+            </li>
             <li><i class="fa-solid fa-list-ul"></i> Histórico</li>
             <li onclick="window.toggleTheme()"><i class="fa-solid fa-moon"></i> Tema Escuro/Claro</li>
             <li><i class="fa-solid fa-headset"></i> Suporte</li>
@@ -200,23 +213,41 @@
         </div>
     </div>
 
-    <!-- LOGIN / REGISTRO -->
-    <div id="login-screen" class="screen" style="position: absolute; width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; z-index: 50; background: var(--bg-body);">
-        <div class="card" style="box-shadow: none; border: none; background: transparent;">
-            <h2 style="font-size: 40px; margin-bottom: 10px; font-weight: 900; letter-spacing: -1px;">GP <span>Games</span></h2>
-            <p style="color: var(--text-muted); font-size: 15px; margin-bottom: 40px;">Skill-based Platform</p>
-            <div style="text-align: left; background: var(--bg-card); padding: 25px; border-radius: 20px; border: 1px solid var(--border-main); box-shadow: var(--shadow-card);">
+    <!-- TELA DE LOGIN / REGISTRO COM SCROLL E LAYOUT INTUITIVO -->
+    <div id="login-screen" class="screen" style="position: absolute; top: 0; left: 0; width: 100vw; min-height: 100vh; display: flex; justify-content: center; align-items: center; z-index: 50; background: var(--bg-body); padding: 20px; overflow-y: auto;">
+        
+        <div class="card" style="box-shadow: none; border: none; background: transparent; width: 100%; max-width: 400px; padding: 0;">
+            <h2 style="font-size: 40px; margin-bottom: 10px; font-weight: 900; letter-spacing: -1px; text-align: center;">GP <span>Games</span></h2>
+            <p style="color: var(--text-muted); font-size: 15px; margin-bottom: 30px; text-align: center;">Skill-based Platform</p>
+            
+            <!-- CAIXA DE LOGIN -->
+            <div id="form-login" style="background: var(--bg-card); padding: 25px; border-radius: 20px; border: 1px solid var(--border-main); box-shadow: var(--shadow-card);">
+                <h3 style="margin-bottom: 15px; font-size: 18px;">Fazer Login</h3>
+                <input type="email" id="email-login" placeholder="Digite seu e-mail">
+                <input type="password" id="senha-login" placeholder="Digite sua senha">
                 
-                <input type="email" id="email-input" placeholder="Digite seu e-mail">
-                <input type="password" id="senha-input" placeholder="Digite sua senha">
+                <button id="btn-login" onclick="window.fazerLoginFirebase()" style="height: 55px; margin-top: 10px;">Entrar na Plataforma</button>
                 
-                <!-- Botões Separados -->
-                <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 15px;">
-                    <button id="btn-login" onclick="window.fazerLoginFirebase()" style="height: 55px; margin: 0;">Entrar na Plataforma</button>
-                    <button id="btn-register" onclick="window.criarContaFirebase()" style="height: 55px; margin: 0; background: transparent; border: 2px solid #00e676; color: #00e676; box-shadow: none;">Criar Nova Conta</button>
+                <div style="text-align: center; margin-top: 20px;">
+                    <span style="color: var(--text-muted); font-size: 14px;">Não tem uma conta?</span>
+                    <a href="#" onclick="window.alternarTelasAuth('registro')" style="color: #00e676; font-weight: 700; text-decoration: none; margin-left: 5px; font-size: 14px;">Criar conta</a>
                 </div>
-
             </div>
+
+            <!-- CAIXA DE REGISTRO (Oculta por padrão) -->
+            <div id="form-registro" class="hidden" style="background: var(--bg-card); padding: 25px; border-radius: 20px; border: 1px solid var(--border-main); box-shadow: var(--shadow-card);">
+                <h3 style="margin-bottom: 15px; font-size: 18px;">Criar Nova Conta</h3>
+                <input type="email" id="email-registro" placeholder="Cadastre seu melhor e-mail">
+                <input type="password" id="senha-registro" placeholder="Crie uma senha (mín. 6 letras)">
+                
+                <button id="btn-registro" onclick="window.criarContaFirebase()" style="height: 55px; margin-top: 10px;">Finalizar Cadastro</button>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <span style="color: var(--text-muted); font-size: 14px;">Já possui conta?</span>
+                    <a href="#" onclick="window.alternarTelasAuth('login')" style="color: #00e676; font-weight: 700; text-decoration: none; margin-left: 5px; font-size: 14px;">Fazer Login</a>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -335,7 +366,6 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Variáveis de Estado
         window.saldo = 0.00;
         window.recordeMultiplicador = 1.00;
         window.currentUser = null;
@@ -346,6 +376,17 @@
         let faixaAtual = 0, targetX = 0, targetY = 0.6, isJumping = false;
         let pularTimeout1, pularTimeout2, gameLoopInterval, obstacleTimeout; 
 
+        // ================= FUNÇÕES DE NAVEGAÇÃO AUTH =================
+        window.alternarTelasAuth = function(tela) {
+            if(tela === 'registro') {
+                document.getElementById('form-login').classList.add('hidden');
+                document.getElementById('form-registro').classList.remove('hidden');
+            } else {
+                document.getElementById('form-registro').classList.add('hidden');
+                document.getElementById('form-login').classList.remove('hidden');
+            }
+        };
+
         // Monitora o estado de Login
         onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -355,9 +396,9 @@
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('welcome-modal').classList.add('active');
                 
-                // Limpa os campos para a próxima vez
-                document.getElementById('email-input').value = "";
-                document.getElementById('senha-input').value = "";
+                // Limpa os campos
+                document.getElementById('email-login').value = ""; document.getElementById('senha-login').value = "";
+                document.getElementById('email-registro').value = ""; document.getElementById('senha-registro').value = "";
             } else {
                 window.currentUser = null;
                 document.getElementById('login-screen').classList.remove('hidden');
@@ -366,63 +407,56 @@
             }
         });
 
-        // 1. FUNÇÃO DE LOGIN EXCLUSIVA
+        // 1. FUNÇÃO DE LOGIN
         window.fazerLoginFirebase = async function() {
-            const email = document.getElementById('email-input').value.trim();
-            const senha = document.getElementById('senha-input').value;
-            
+            const email = document.getElementById('email-login').value.trim();
+            const senha = document.getElementById('senha-login').value;
             if(!email || !senha) return window.mostrarModal("Atenção", "Preencha e-mail e senha para entrar.", "aviso");
             
             const btn = document.getElementById('btn-login');
             btn.innerText = "Carregando...";
-            
             try {
                 await signInWithEmailAndPassword(auth, email, senha);
             } catch (error) {
-                if(error.code === 'auth/invalid-credential') {
-                    window.mostrarModal("Erro no Login", "E-mail ou senha incorretos.", "erro");
-                } else if(error.code === 'auth/invalid-email') {
-                    window.mostrarModal("Erro no Login", "Formato de e-mail inválido.", "erro");
-                } else {
-                    window.mostrarModal("Erro no Login", error.message, "erro");
-                }
+                if(error.code === 'auth/invalid-credential') window.mostrarModal("Erro no Login", "E-mail ou senha incorretos.", "erro");
+                else if(error.code === 'auth/invalid-email') window.mostrarModal("Erro no Login", "Formato de e-mail inválido.", "erro");
+                else window.mostrarModal("Erro no Login", error.message, "erro");
             }
             btn.innerText = "Entrar na Plataforma";
         };
 
-        // 2. FUNÇÃO DE CRIAR CONTA EXCLUSIVA
+        // 2. FUNÇÃO DE CRIAR CONTA (Com tratamento silencioso do Firestore)
         window.criarContaFirebase = async function() {
-            const email = document.getElementById('email-input').value.trim();
-            const senha = document.getElementById('senha-input').value;
-            
+            const email = document.getElementById('email-registro').value.trim();
+            const senha = document.getElementById('senha-registro').value;
             if(!email || !senha) return window.mostrarModal("Atenção", "Preencha um e-mail e uma senha para se cadastrar.", "aviso");
             
-            const btn = document.getElementById('btn-register');
+            const btn = document.getElementById('btn-registro');
             btn.innerText = "Criando...";
             
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
-                // Cria o documento zerado no banco após criar a conta
-                await setDoc(doc(db, "usuarios", userCredential.user.uid), {
-                    email: email,
-                    saldo: 0.00,
-                    recorde: 1.00
-                });
-            } catch (error) {
-                if(error.code === 'auth/email-already-in-use') {
-                    window.mostrarModal("Erro no Cadastro", "Este e-mail já está cadastrado. Tente fazer login.", "erro");
-                } else if(error.code === 'auth/weak-password') {
-                    window.mostrarModal("Erro no Cadastro", "A senha é muito fraca. Use pelo menos 6 caracteres.", "erro");
-                } else {
-                    window.mostrarModal("Erro no Cadastro", error.message, "erro");
+                try {
+                    await setDoc(doc(db, "usuarios", userCredential.user.uid), {
+                        email: email, saldo: 0.00, recorde: 1.00
+                    });
+                } catch (fsError) {
+                    // Erro silenciado para o usuário final, a conta já foi criada no Auth.
+                    console.warn("Conta Auth criada. Erro ao configurar doc inicial no Firestore (cheque as regras):", fsError);
                 }
+                // Não precisa mostrar modal de sucesso, o onAuthStateChanged já puxa pra tela inicial!
+            } catch (error) {
+                if(error.code === 'auth/email-already-in-use') window.mostrarModal("Erro", "Este e-mail já está cadastrado.", "erro");
+                else if(error.code === 'auth/weak-password') window.mostrarModal("Erro", "A senha é muito fraca. Mínimo de 6 letras.", "erro");
+                else window.mostrarModal("Erro no Cadastro", error.message, "erro");
             }
-            btn.innerText = "Criar Nova Conta";
+            btn.innerText = "Finalizar Cadastro";
         };
 
         window.sairDaConta = function() {
             signOut(auth);
             window.fecharMenu();
+            window.alternarTelasAuth('login');
         };
 
         async function puxarDadosDoBanco() {
@@ -449,7 +483,7 @@
             window.saldo = novoSaldo;
             atualizarUI();
             if(window.currentUser) {
-                await updateDoc(doc(db, "usuarios", window.currentUser.uid), { saldo: window.saldo });
+                try { await updateDoc(doc(db, "usuarios", window.currentUser.uid), { saldo: window.saldo }); } catch(e){}
             }
         }
 
@@ -457,7 +491,7 @@
             window.recordeMultiplicador = novoRecorde;
             document.getElementById('recorde-display').innerText = window.recordeMultiplicador.toFixed(2) + 'x';
             if(window.currentUser) {
-                await updateDoc(doc(db, "usuarios", window.currentUser.uid), { recorde: window.recordeMultiplicador });
+                try { await updateDoc(doc(db, "usuarios", window.currentUser.uid), { recorde: window.recordeMultiplicador }); } catch(e){}
             }
         }
 
@@ -538,13 +572,8 @@
         function gameLoop() {
             if (!jogoRodando) return;
             multiplicador += 0.0020; 
-            
-            if (multiplicador >= 1.05) { 
-                velocidadeBase += 0.0015; 
-                document.getElementById('multiplier-display').classList.add('turbo-mode'); 
-            } else { 
-                velocidadeBase += 0.0004; 
-            }
+            if (multiplicador >= 1.05) { velocidadeBase += 0.0015; document.getElementById('multiplier-display').classList.add('turbo-mode'); } 
+            else { velocidadeBase += 0.0004; }
             
             document.getElementById('multiplier-display').innerText = multiplicador.toFixed(2) + 'x';
             document.getElementById('profit-display').innerText = 'Lucro: R$ ' + (valorAposta * multiplicador).toFixed(2);
@@ -565,7 +594,6 @@
             if (!jogoRodando) return;
             let chanceDuplo = (multiplicador > 1.02) ? 0.20 : 0;
             if (multiplicador >= 1.05) chanceDuplo = 0.60; 
-            
             let faixas = [-1, 0, 1].sort(() => Math.random() - 0.5);
             let qtd = (Math.random() < chanceDuplo) ? 2 : 1;
             
