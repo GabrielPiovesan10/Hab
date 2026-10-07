@@ -84,7 +84,7 @@
         .header { padding: 15px 20px; padding-top: max(15px, env(safe-area-inset-top)); background: var(--nav-bg); backdrop-filter: blur(10px); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-main); position: sticky; top: 0; z-index: 20; }
         .logo { font-size: 20px; font-weight: 900; letter-spacing: -0.5px; }
         .logo span { color: #00d26a; }
-        .balance-badge { background: var(--input-bg); color: #00e676; padding: 8px 14px; border-radius: 20px; font-weight: 800; font-size: 14px; border: 1px solid var(--border-solid); display: flex; align-items: center; gap: 8px; }
+        .balance-badge { background: var(--input-bg); color: #00e676; padding: 8px 14px; border-radius: 20px; font-weight: 800; font-size: 14px; border: 1px solid var(--border-solid); display: flex; align-items: center; gap: 8px; cursor: pointer; }
 
         .tab-content { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 100px; display: none; }
         .tab-content.active { display: block; animation: fadeUp 0.4s ease; }
@@ -164,16 +164,16 @@
     </div>
 
     <!-- SIDEBAR -->
-    <div class="sidebar-overlay" id="sidebar-overlay" onclick="fecharMenu()"></div>
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="window.fecharMenu()"></div>
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <h2 style="font-weight: 900;">GP <span>Games</span></h2>
-            <button class="btn-icon" onclick="fecharMenu()" style="border: none;"><i class="fa-solid fa-xmark"></i></button>
+            <button class="btn-icon" onclick="window.fecharMenu()" style="border: none;"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <ul class="sidebar-menu">
             <li><i class="fa-solid fa-user"></i> Meu Perfil (<span id="user-display-email" style="font-size: 11px;"></span>)</li>
             <li><i class="fa-solid fa-list-ul"></i> Histórico</li>
-            <li onclick="toggleTheme()"><i class="fa-solid fa-moon"></i> Tema Escuro/Claro</li>
+            <li onclick="window.toggleTheme()"><i class="fa-solid fa-moon"></i> Tema Escuro/Claro</li>
             <li><i class="fa-solid fa-headset"></i> Suporte</li>
             <li style="color: #ff3333; margin-top: auto;" onclick="window.sairDaConta()"><i class="fa-solid fa-right-from-bracket" style="color: #ff3333;"></i> Sair da Conta</li>
         </ul>
@@ -187,7 +187,7 @@
             <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">Antes de começar, você precisa entender como a plataforma funciona.</p>
             <div class="rule-item"><i class="fa-solid fa-brain"></i><div><h4>100% Habilidade</h4><p>Sem algoritmos de sorte. Você controla e decide quando sacar.</p></div></div>
             <div class="rule-item"><i class="fa-brands fa-pix" style="color: #00e676;"></i><div><h4>Pagamentos Seguros</h4><p>Depósitos e Saques são processados via PIX com nosso suporte.</p></div></div>
-            <button onclick="aceitarRegras()" style="margin-top: 15px; height: 55px;">EU ENTENDO E CONCORDO</button>
+            <button onclick="window.aceitarRegras()" style="margin-top: 15px; height: 55px;">EU ENTENDO E CONCORDO</button>
         </div>
     </div>
 
@@ -196,19 +196,26 @@
             <div id="modal-icon" style="font-size: 50px; margin-bottom: 15px;"></div>
             <h2 id="modal-title" style="font-size: 22px; font-weight: 800; margin-bottom: 10px;">Título</h2>
             <p id="modal-message" style="color: var(--text-muted); font-size: 15px; margin-bottom: 25px;">Mensagem</p>
-            <button id="modal-btn" onclick="fecharModal()">OK</button>
+            <button id="modal-btn" onclick="window.fecharModal()">OK</button>
         </div>
     </div>
 
-    <!-- LOGIN -->
+    <!-- LOGIN / REGISTRO -->
     <div id="login-screen" class="screen" style="position: absolute; width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; z-index: 50; background: var(--bg-body);">
         <div class="card" style="box-shadow: none; border: none; background: transparent;">
             <h2 style="font-size: 40px; margin-bottom: 10px; font-weight: 900; letter-spacing: -1px;">GP <span>Games</span></h2>
             <p style="color: var(--text-muted); font-size: 15px; margin-bottom: 40px;">Skill-based Platform</p>
             <div style="text-align: left; background: var(--bg-card); padding: 25px; border-radius: 20px; border: 1px solid var(--border-main); box-shadow: var(--shadow-card);">
-                <input type="email" id="email-input" placeholder="E-mail" value="jogador@email.com">
-                <input type="password" id="senha-input" placeholder="Senha" value="123456">
-                <button id="btn-login" onclick="window.fazerLoginFirebase()" style="margin-top: 10px; height: 55px;">Entrar na Plataforma</button>
+                
+                <input type="email" id="email-input" placeholder="Digite seu e-mail">
+                <input type="password" id="senha-input" placeholder="Digite sua senha">
+                
+                <!-- Botões Separados -->
+                <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 15px;">
+                    <button id="btn-login" onclick="window.fazerLoginFirebase()" style="height: 55px; margin: 0;">Entrar na Plataforma</button>
+                    <button id="btn-register" onclick="window.criarContaFirebase()" style="height: 55px; margin: 0; background: transparent; border: 2px solid #00e676; color: #00e676; box-shadow: none;">Criar Nova Conta</button>
+                </div>
+
             </div>
         </div>
     </div>
@@ -217,11 +224,11 @@
     <div id="app-screen" class="hidden">
         <div class="header">
             <div style="display: flex; align-items: center; gap: 15px;">
-                <button class="btn-icon" onclick="abrirMenu()" style="border: none; box-shadow: none;"><i class="fa-solid fa-bars" style="font-size: 22px;"></i></button>
+                <button class="btn-icon" onclick="window.abrirMenu()" style="border: none; box-shadow: none;"><i class="fa-solid fa-bars" style="font-size: 22px;"></i></button>
                 <div class="logo">GP <span>Games</span></div>
             </div>
             <div style="display: flex; gap: 10px; align-items: center;">
-                <button id="theme-btn" onclick="toggleTheme()" class="btn-icon"><i class="fa-solid fa-moon"></i></button>
+                <button id="theme-btn" onclick="window.toggleTheme()" class="btn-icon"><i class="fa-solid fa-moon"></i></button>
                 <div class="balance-badge" onclick="window.atualizarSaldoDoBanco()">
                     R$ <span id="user-balance">0.00</span>
                     <i class="fa-solid fa-rotate-right" style="margin-left:5px; font-size:10px; color:var(--text-muted);"></i>
@@ -247,16 +254,16 @@
                 <h3>Defina o Valor da Entrada</h3>
                 <p>Mínimo exigido de R$ 2,00</p>
                 <div class="quick-amounts">
-                    <button class="btn-quick" onclick="setValor(2)">R$ 2</button>
-                    <button class="btn-quick" onclick="setValor(5)">R$ 5</button>
-                    <button class="btn-quick" onclick="setValor(10)">R$ 10</button>
-                    <button class="btn-quick" onclick="setValor(20)">R$ 20</button>
+                    <button class="btn-quick" onclick="window.setValor(2)">R$ 2</button>
+                    <button class="btn-quick" onclick="window.setValor(5)">R$ 5</button>
+                    <button class="btn-quick" onclick="window.setValor(10)">R$ 10</button>
+                    <button class="btn-quick" onclick="window.setValor(20)">R$ 20</button>
                 </div>
                 <div class="input-bet-wrapper">
                     <span>R$</span>
-                    <input type="text" inputmode="decimal" id="bet-input" value="5.00" onblur="formatarDinheiro(this)">
+                    <input type="text" inputmode="decimal" id="bet-input" value="5.00" onblur="window.formatarDinheiro(this)">
                 </div>
-                <button class="btn-play" onclick="iniciarJogo()"><i class="fa-solid fa-play" style="margin-right: 8px;"></i> JOGAR AGORA</button>
+                <button class="btn-play" onclick="window.iniciarJogo()"><i class="fa-solid fa-play" style="margin-right: 8px;"></i> JOGAR AGORA</button>
             </div>
         </div>
 
@@ -277,7 +284,7 @@
                 <h4 style="margin-bottom: 15px; font-size: 15px;">1. Copie a Chave PIX:</h4>
                 <div class="pix-box"><div style="font-size: 12px; color: var(--text-muted);">Celular / Email</div><div class="pix-key">contato@gpgames.com.br</div></div>
                 <h4 style="margin-bottom: 15px; font-size: 15px; margin-top: 30px;">2. Avise o Suporte:</h4>
-                <button class="btn-whatsapp" onclick="abrirWhatsApp('deposito')"><i class="fa-brands fa-whatsapp"></i> WhatsApp Suporte</button>
+                <button class="btn-whatsapp" onclick="window.abrirWhatsApp('deposito')"><i class="fa-brands fa-whatsapp"></i> WhatsApp Suporte</button>
             </div>
         </div>
 
@@ -285,19 +292,19 @@
             <h2 style="font-size: 24px; font-weight: 900; margin-bottom: 10px;">Sacar Lucros</h2>
             <div class="card">
                 <label style="font-size: 13px; color: var(--text-muted); font-weight: 600;">Valor (R$)</label>
-                <input type="text" inputmode="decimal" placeholder="Ex: 50.00" id="saque-input" onblur="formatarDinheiro(this)">
+                <input type="text" inputmode="decimal" placeholder="Ex: 50.00" id="saque-input" onblur="window.formatarDinheiro(this)">
                 <label style="font-size: 13px; color: var(--text-muted); font-weight: 600;">Sua Chave PIX</label>
                 <input type="text" placeholder="CPF, Celular ou Email" id="chave-pix">
-                <button onclick="solicitarSaqueManual()" style="margin-top: 15px; height: 55px;"><i class="fa-solid fa-money-bill-transfer"></i> Solicitar Saque</button>
+                <button onclick="window.solicitarSaqueManual()" style="margin-top: 15px; height: 55px;"><i class="fa-solid fa-money-bill-transfer"></i> Solicitar Saque</button>
             </div>
         </div>
 
         <!-- NAV INFERIOR -->
         <div class="bottom-nav">
-            <div class="nav-item active" onclick="mudarAba('home', this)"><i class="fa-solid fa-gamepad nav-icon"></i><span>Início</span></div>
-            <div class="nav-item" onclick="mudarAba('ranking', this)"><i class="fa-solid fa-ranking-star nav-icon"></i><span>Ranking</span></div>
-            <div class="nav-item" onclick="mudarAba('deposit', this)"><i class="fa-solid fa-circle-arrow-down nav-icon"></i><span>Depositar</span></div>
-            <div class="nav-item" onclick="mudarAba('withdraw', this)"><i class="fa-solid fa-circle-arrow-up nav-icon"></i><span>Sacar</span></div>
+            <div class="nav-item active" onclick="window.mudarAba('home', this)"><i class="fa-solid fa-gamepad nav-icon"></i><span>Início</span></div>
+            <div class="nav-item" onclick="window.mudarAba('ranking', this)"><i class="fa-solid fa-ranking-star nav-icon"></i><span>Ranking</span></div>
+            <div class="nav-item" onclick="window.mudarAba('deposit', this)"><i class="fa-solid fa-circle-arrow-down nav-icon"></i><span>Depositar</span></div>
+            <div class="nav-item" onclick="window.mudarAba('withdraw', this)"><i class="fa-solid fa-circle-arrow-up nav-icon"></i><span>Sacar</span></div>
         </div>
     </div>
 
@@ -328,7 +335,7 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Variáveis de Estado (agora atreladas ao banco)
+        // Variáveis de Estado
         window.saldo = 0.00;
         window.recordeMultiplicador = 1.00;
         window.currentUser = null;
@@ -347,6 +354,10 @@
                 await puxarDadosDoBanco();
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('welcome-modal').classList.add('active');
+                
+                // Limpa os campos para a próxima vez
+                document.getElementById('email-input').value = "";
+                document.getElementById('senha-input').value = "";
             } else {
                 window.currentUser = null;
                 document.getElementById('login-screen').classList.remove('hidden');
@@ -355,56 +366,83 @@
             }
         });
 
-        // Função de Login/Registro automático
+        // 1. FUNÇÃO DE LOGIN EXCLUSIVA
         window.fazerLoginFirebase = async function() {
-            const email = document.getElementById('email-input').value;
+            const email = document.getElementById('email-input').value.trim();
             const senha = document.getElementById('senha-input').value;
+            
+            if(!email || !senha) return window.mostrarModal("Atenção", "Preencha e-mail e senha para entrar.", "aviso");
+            
             const btn = document.getElementById('btn-login');
             btn.innerText = "Carregando...";
             
             try {
-                // Tenta logar primeiro
                 await signInWithEmailAndPassword(auth, email, senha);
             } catch (error) {
-                // Se o usuário não existir, cria a conta na hora
-                if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
-                    try {
-                        const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
-                        // Cria o documento zerado no banco
-                        await setDoc(doc(db, "usuarios", userCredential.user.uid), {
-                            email: email,
-                            saldo: 0.00, // Começa com zero. Depósitos você edita no Console do Firebase.
-                            recorde: 1.00
-                        });
-                    } catch (errReg) {
-                        alert("Erro ao criar conta: " + errReg.message);
-                    }
+                if(error.code === 'auth/invalid-credential') {
+                    window.mostrarModal("Erro no Login", "E-mail ou senha incorretos.", "erro");
+                } else if(error.code === 'auth/invalid-email') {
+                    window.mostrarModal("Erro no Login", "Formato de e-mail inválido.", "erro");
                 } else {
-                    alert("Erro no login: " + error.message);
+                    window.mostrarModal("Erro no Login", error.message, "erro");
                 }
             }
             btn.innerText = "Entrar na Plataforma";
         };
 
+        // 2. FUNÇÃO DE CRIAR CONTA EXCLUSIVA
+        window.criarContaFirebase = async function() {
+            const email = document.getElementById('email-input').value.trim();
+            const senha = document.getElementById('senha-input').value;
+            
+            if(!email || !senha) return window.mostrarModal("Atenção", "Preencha um e-mail e uma senha para se cadastrar.", "aviso");
+            
+            const btn = document.getElementById('btn-register');
+            btn.innerText = "Criando...";
+            
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
+                // Cria o documento zerado no banco após criar a conta
+                await setDoc(doc(db, "usuarios", userCredential.user.uid), {
+                    email: email,
+                    saldo: 0.00,
+                    recorde: 1.00
+                });
+            } catch (error) {
+                if(error.code === 'auth/email-already-in-use') {
+                    window.mostrarModal("Erro no Cadastro", "Este e-mail já está cadastrado. Tente fazer login.", "erro");
+                } else if(error.code === 'auth/weak-password') {
+                    window.mostrarModal("Erro no Cadastro", "A senha é muito fraca. Use pelo menos 6 caracteres.", "erro");
+                } else {
+                    window.mostrarModal("Erro no Cadastro", error.message, "erro");
+                }
+            }
+            btn.innerText = "Criar Nova Conta";
+        };
+
         window.sairDaConta = function() {
             signOut(auth);
+            window.fecharMenu();
         };
 
         async function puxarDadosDoBanco() {
             if(!window.currentUser) return;
-            const docRef = doc(db, "usuarios", window.currentUser.uid);
-            const docSnap = await getDoc(docRef);
-            if (docSnap.exists()) {
-                window.saldo = docSnap.data().saldo || 0;
-                window.recordeMultiplicador = docSnap.data().recorde || 1.00;
+            try {
+                const docRef = doc(db, "usuarios", window.currentUser.uid);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    window.saldo = docSnap.data().saldo || 0;
+                    window.recordeMultiplicador = docSnap.data().recorde || 1.00;
+                }
+                atualizarUI();
+            } catch (error) {
+                console.error("Erro ao puxar dados: ", error);
             }
-            atualizarUI();
         }
 
-        // Função extra para o usuário puxar o saldo atualizado (caso vc edite no Firebase)
         window.atualizarSaldoDoBanco = async function() {
             await puxarDadosDoBanco();
-            mostrarModal('Atualizado', 'Seu saldo foi sincronizado com o banco de dados.', 'sucesso');
+            window.mostrarModal('Atualizado', 'Seu saldo foi sincronizado com o servidor.', 'sucesso');
         }
 
         async function salvarSaldoNoBanco(novoSaldo) {
@@ -428,7 +466,7 @@
             document.getElementById('recorde-display').innerText = window.recordeMultiplicador.toFixed(2) + 'x';
         }
 
-        // ================= FUNÇÕES DA INTERFACE (Exportadas para janela Global) =================
+        // ================= FUNÇÕES DA INTERFACE =================
         window.abrirMenu = function() { document.getElementById('sidebar').classList.add('active'); document.getElementById('sidebar-overlay').classList.add('active'); }
         window.fecharMenu = function() { document.getElementById('sidebar').classList.remove('active'); document.getElementById('sidebar-overlay').classList.remove('active'); }
         window.setValor = function(val) { document.getElementById('bet-input').value = val.toFixed(2); }
@@ -468,7 +506,6 @@
             if(!chave) return window.mostrarModal('Atenção', 'Digite a chave PIX.', 'aviso');
             if(valor > window.saldo) return window.mostrarModal('Erro de Saldo', 'Saldo insuficiente.', 'erro');
             
-            // Subtrai o valor do banco e abre o WhatsApp
             salvarSaldoNoBanco(window.saldo - valor);
             window.open(`https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(`Solicito saque de R$ ${valor.toFixed(2)}. Chave PIX:${chave}. Email logado: ${window.currentUser.email}`)}`, '_blank');
             document.getElementById('saque-input').value = ''; document.getElementById('chave-pix').value = '';
@@ -480,7 +517,6 @@
             if(isNaN(valorAposta) || valorAposta < 2) return window.mostrarModal('Aviso', 'A entrada mínima é de R$ 2,00', 'aviso');
             if(window.saldo < valorAposta) return window.mostrarModal('Saldo Insuficiente', 'Faça um depósito para jogar.', 'erro');
             
-            // DESCONTA A APOSTA NO BANCO DE DADOS
             await salvarSaldoNoBanco(window.saldo - valorAposta);
             
             document.getElementById('app-screen').classList.add('hidden'); document.getElementById('game-ui').classList.remove('hidden');
@@ -568,7 +604,6 @@
             jogoRodando = false; 
             let lucro = valorAposta * multiplicador; 
             
-            // ADICIONA O LUCRO NO BANCO DE DADOS
             await salvarSaldoNoBanco(window.saldo + lucro);
             
             if(multiplicador > window.recordeMultiplicador) { 
