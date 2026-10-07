@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>GP Games - Skill Platform</title>
+    
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* ================= VARIÁVEIS DE TEMA ================= */
+        :root {
+            --bg-body: #0b0e14; --bg-card: #151a22; --text-main: #ffffff; --text-muted: #a0a8b8;
+            --border-main: rgba(255, 255, 255, 0.05); --border-solid: #2a3140;
+            --input-bg: #0b0e14; --nav-bg: rgba(21, 26, 34, 0.95);
+            --shadow-card: 0 10px 40px rgba(0, 0, 0, 0.3); --modal-overlay: rgba(0, 0, 0, 0.85);
+            --trust-bg: rgba(255, 170, 0, 0.1); --trust-border: rgba(255, 170, 0, 0.3);
+            --gold: #ffd700; --silver: #c0c0c0; --bronze: #cd7f32;
+        }
+
+        body.light-mode {
+            --bg-body: #f3f4f6; --bg-card: #ffffff; --text-main: #1f2937; --text-muted: #6b7280;
+            --border-main: rgba(0, 0, 0, 0.05); --border-solid: #d1d5db;
+            --input-bg: #f9fafb; --nav-bg: rgba(255, 255, 255, 0.95);
+            --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.05); --modal-overlay: rgba(0, 0, 0, 0.5);
+            --trust-bg: #fffbf0; --trust-border: #fcd34d;
+        }
+
+        /* ================= ESTILOS GERAIS ================= */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg-body); color: var(--text-main); overflow: hidden; touch-action: none; overscroll-behavior: none; transition: 0.3s; }
+        .hidden { display: none !important; }
+        
+        .card { 
+            background: var(--bg-card); padding: 25px; border-radius: 16px; width: 100%;
+            border: 1px solid var(--border-main); box-shadow: var(--shadow-card); margin-bottom: 20px; transition: 0.3s;
+        }
+        
+        input { 
+            width: 100%; padding: 16px; margin: 8px 0 16px; border-radius: 12px; 
+            border: 1px solid var(--border-solid); background: var(--input-bg); color: var(--text-main); font-size: 15px; 
+            outline: none; transition: 0.2s; font-weight: 600;
+        }
+        input:focus { border-color: #00e676; box-shadow: 0 0 0 3px rgba(0, 230, 118, 0.1); }
+        
+        button { 
+            width: 100%; padding: 16px; margin: 8px 0; border: none; border-radius: 12px; 
+            background: linear-gradient(90deg, #00d26a 0%, #00e676 100%); color: #0b0e14; 
+            font-weight: 900; font-size: 15px; text-transform: uppercase; letter-spacing: 0.5px;
+            cursor: pointer; transition: 0.2s; box-shadow: 0 4px 15px rgba(0, 210, 106, 0.2); 
+        }
+        button:active { transform: scale(0.97); opacity: 0.9; }
+        .btn-whatsapp { background: linear-gradient(90deg, #25D366 0%, #128C7E 100%); color: white; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.2); }
+        .btn-icon { width: 40px; height: 40px; padding: 0; margin: 0; border-radius: 50%; background: transparent; border: 1px solid var(--border-solid); color: var(--text-main); box-shadow: none; display: flex; justify-content: center; align-items: center; font-size: 16px; transition: 0.3s; }
+
+        /* ================= MENU LATERAL ================= */
+        .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 1000; opacity: 0; pointer-events: none; transition: 0.3s; }
+        .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
+        .sidebar { position: fixed; top: 0; left: -300px; width: 280px; height: 100vh; background: var(--nav-bg); backdrop-filter: blur(20px); border-right: 1px solid var(--border-main); z-index: 1001; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.05); display: flex; flex-direction: column; padding: 20px; padding-top: max(20px, env(safe-area-inset-top)); }
+        .sidebar.active { left: 0; }
+        .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid var(--border-solid); padding-bottom: 15px; }
+        .sidebar-menu { list-style: none; display: flex; flex-direction: column; gap: 15px; }
+        .sidebar-menu li { display: flex; align-items: center; gap: 15px; font-size: 16px; font-weight: 600; color: var(--text-main); padding: 12px; border-radius: 10px; cursor: pointer; transition: 0.2s; }
+        .sidebar-menu li:active { background: var(--border-main); }
+        .sidebar-menu li i { color: #00e676; font-size: 20px; width: 25px; text-align: center; }
+
+        /* ================= MODAIS ================= */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: var(--modal-overlay); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 1100; opacity: 0; pointer-events: none; transition: 0.3s ease; }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-box { background: var(--bg-card); padding: 30px 25px; border-radius: 24px; width: 88%; max-width: 380px; text-align: center; position: relative; border: 1px solid var(--border-main); box-shadow: 0 20px 50px rgba(0,0,0,0.3); transform: translateY(20px); transition: 0.3s; max-height: 90vh; overflow-y: auto; color: var(--text-main); }
+        .modal-overlay.active .modal-box { transform: translateY(0); }
+        
+        .welcome-header { font-size: 50px; color: #00e676; margin-bottom: 15px; }
+        .welcome-title { font-size: 24px; font-weight: 900; margin-bottom: 15px; }
+        .rule-item { display: flex; align-items: flex-start; gap: 15px; text-align: left; background: var(--input-bg); padding: 15px; border-radius: 12px; margin-bottom: 12px; border: 1px solid var(--border-solid); }
+        .rule-item i { color: #00e676; font-size: 20px; margin-top: 2px; }
+        .rule-item h4 { font-size: 14px; margin-bottom: 4px; font-weight: 700; }
+        .rule-item p { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+
+        /* ================= PLATAFORMA APP ================= */
+        #app-screen { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; display: flex; flex-direction: column; background: var(--bg-body); z-index: 10; transition: 0.3s; }
+        .header { padding: 15px 20px; padding-top: max(15px, env(safe-area-inset-top)); background: var(--nav-bg); backdrop-filter: blur(10px); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-main); position: sticky; top: 0; z-index: 20; }
+        .logo { font-size: 20px; font-weight: 900; letter-spacing: -0.5px; }
+        .logo span { color: #00d26a; }
+        .balance-badge { background: var(--input-bg); color: #00e676; padding: 8px 14px; border-radius: 20px; font-weight: 800; font-size: 14px; border: 1px solid var(--border-solid); display: flex; align-items: center; gap: 8px; }
+
+        .tab-content { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 100px; display: none; }
+        .tab-content.active { display: block; animation: fadeUp 0.4s ease; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        .stat-box { background: var(--bg-card); padding: 15px; border-radius: 16px; border: 1px solid var(--border-solid); text-align: left; position: relative; overflow: hidden; transition: 0.3s; }
+        .stat-box span { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
+        .stat-box h3 { font-size: 22px; font-weight: 900; margin-top: 5px; }
+        .stat-box h3.highlight { color: #00e676; }
+
+        .game-banner { background: url('https://images.unsplash.com/photo-1550745165-9bc0b252726f?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80') center/cover; border-radius: 20px 20px 0 0; padding: 25px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; min-height: 180px; }
+        .game-banner::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(11, 14, 20, 1) 0%, rgba(11, 14, 20, 0.2) 100%); }
+        .game-banner-content { position: relative; z-index: 2; text-align: left; }
+        .badge-skill { background: #00e676; color: #0b0e14; font-size: 10px; font-weight: 900; padding: 4px 10px; border-radius: 20px; display: inline-block; margin-bottom: 10px; text-transform: uppercase; }
+
+        .bet-panel { background: var(--bg-card); border: 1px solid var(--border-main); border-radius: 0 0 20px 20px; padding: 25px; margin-bottom: 25px; box-shadow: var(--shadow-card); text-align: center; }
+        .bet-panel h3 { font-size: 16px; font-weight: 800; margin-bottom: 5px; }
+        .bet-panel p { font-size: 12px; color: var(--text-muted); margin-bottom: 20px; font-weight: 600; }
+        .quick-amounts { display: flex; gap: 10px; margin-bottom: 15px; }
+        .btn-quick { flex: 1; padding: 12px 0; background: var(--input-bg); border: 1px solid var(--border-solid); color: var(--text-main); font-weight: 700; border-radius: 10px; font-size: 14px; box-shadow: none; margin: 0; }
+        .btn-quick:active { border-color: #00e676; color: #00e676; }
+        .input-bet-wrapper { position: relative; margin-bottom: 20px; }
+        .input-bet-wrapper span { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-weight: 800; color: #00e676; font-size: 20px; }
+        .input-bet-wrapper input { font-size: 28px; font-weight: 900; padding-left: 60px; height: 70px; margin: 0; }
+        .btn-play { height: 65px; font-size: 18px; letter-spacing: 1px; margin: 0; }
+
+        .ranking-header { text-align: center; margin-bottom: 25px; }
+        .ranking-header i { font-size: 40px; color: var(--gold); margin-bottom: 10px; }
+        .ranking-header h2 { font-size: 22px; font-weight: 900; margin-bottom: 5px; }
+        .ranking-header p { font-size: 13px; color: var(--text-muted); }
+        .ranking-list { display: flex; flex-direction: column; gap: 10px; }
+        .rank-item { display: flex; align-items: center; justify-content: space-between; background: var(--bg-card); padding: 15px 20px; border-radius: 14px; border: 1px solid var(--border-main); }
+        .rank-pos { font-size: 18px; font-weight: 900; width: 30px; }
+        .pos-1 { color: var(--gold); } .pos-2 { color: var(--silver); } .pos-3 { color: var(--bronze); }
+        .rank-user { flex: 1; margin-left: 15px; font-weight: 700; font-size: 15px; }
+        .rank-score { font-weight: 900; color: #00e676; font-size: 16px; background: rgba(0,230,118,0.1); padding: 5px 12px; border-radius: 10px; }
+
+        .trust-notice { background: var(--trust-bg); border: 1px solid var(--trust-border); padding: 15px; border-radius: 12px; margin-bottom: 25px; text-align: left; display: flex; gap: 12px; }
+        .trust-notice i { color: #f59e0b; font-size: 20px; margin-top: 3px; }
+        .trust-notice h4 { color: #d97706; font-size: 14px; margin-bottom: 6px; font-weight: 800; }
+        .trust-notice p { color: var(--text-muted); font-size: 12px; line-height: 1.5; font-weight: 500; }
+        .pix-box { background: var(--input-bg); border: 1px dashed var(--border-solid); padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+        .pix-key { font-size: 18px; color: #00e676; font-weight: 800; letter-spacing: 1px; margin: 10px 0; user-select: all; }
+
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: calc(75px + env(safe-area-inset-bottom)); background: var(--nav-bg); backdrop-filter: blur(15px); display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-main); padding: 0 10px; padding-bottom: env(safe-area-inset-bottom); z-index: 20; }
+        .nav-item { color: var(--text-muted); display: flex; flex-direction: column; align-items: center; font-size: 10px; font-weight: 700; width: 25%; cursor: pointer; transition: 0.2s; }
+        .nav-item.active { color: #00e676; }
+        .nav-icon { font-size: 20px; margin-bottom: 6px; transition: 0.2s; }
+        .nav-item.active .nav-icon { transform: translateY(-3px); }
+
+        /* ================= HUD DO JOGO ================= */
+        #game-ui { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 5; }
+        #top-ui { position: absolute; top: max(8vh, env(safe-area-inset-top)); left: 0; width: 100%; text-align: center; }
+        #multiplier-display { font-size: 80px; font-weight: 900; color: #00d26a; text-shadow: 0 4px 20px rgba(0, 210, 106, 0.3); letter-spacing: -3px; }
+        .turbo-mode { color: #ff3333 !important; text-shadow: 0 4px 30px rgba(255, 51, 51, 0.6) !important; transform: scale(1.03); }
+        #profit-display { display: inline-block; margin-top: -10px; padding: 8px 20px; border-radius: 20px; font-size: 18px; font-weight: 800; color: #fff; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+        #bottom-ui { position: absolute; bottom: max(35px, env(safe-area-inset-bottom)); left: 0; width: 100%; padding: 0 25px; text-align: center; }
+        #cashout-btn { pointer-events: auto; background: linear-gradient(90deg, #ff9900 0%, #ffaa00 100%); color: #0b0e14; font-size: 22px; height: 75px; border-radius: 16px; font-weight: 900; margin: 0; }
+        #game-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; }
+    </style>
+</head>
+<body>
+
+    <!-- 3D ENGINE -->
+    <div id="game-container">
+        <a-scene embedded vr-mode-ui="enabled: false">
+            <a-sky id="game-sky" color="#0b0e14"></a-sky>
+            <a-light type="directional" position="-1 2 1" intensity="0.8"></a-light>
+            <a-light type="ambient" intensity="0.6"></a-light>
+            <a-plane position="0 0 -50" rotation="-90 0 0" width="7" height="200" color="#151a22"></a-plane>
+            <a-plane position="-1 0.01 -50" rotation="-90 0 0" width="0.05" height="200" color="#ff3333"></a-plane>
+            <a-plane position="1 0.01 -50" rotation="-90 0 0" width="0.05" height="200" color="#ff3333"></a-plane>
+            <a-box id="player" position="0 0.6 0" width="0.8" height="1.2" depth="0.8" color="#00e676"></a-box>
+            <a-entity id="camera-rig" position="0 6.5 8.5" rotation="-16 0 0"><a-camera look-controls="enabled: false" wasd-controls="enabled: false"></a-camera></a-entity>
+        </a-scene>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="fecharMenu()"></div>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2 style="font-weight: 900;">GP <span>Games</span></h2>
+            <button class="btn-icon" onclick="fecharMenu()" style="border: none;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <ul class="sidebar-menu">
+            <li><i class="fa-solid fa-user"></i> Meu Perfil (<span id="user-display-email" style="font-size: 11px;"></span>)</li>
+            <li><i class="fa-solid fa-list-ul"></i> Histórico</li>
+            <li onclick="toggleTheme()"><i class="fa-solid fa-moon"></i> Tema Escuro/Claro</li>
+            <li><i class="fa-solid fa-headset"></i> Suporte</li>
+            <li style="color: #ff3333; margin-top: auto;" onclick="window.sairDaConta()"><i class="fa-solid fa-right-from-bracket" style="color: #ff3333;"></i> Sair da Conta</li>
+        </ul>
+    </div>
+
+    <!-- MODAIS -->
+    <div id="welcome-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="welcome-header"><i class="fa-solid fa-shield-halved"></i></div>
+            <h2 class="welcome-title">Bem-vindo à GP Games</h2>
+            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">Antes de começar, você precisa entender como a plataforma funciona.</p>
+            <div class="rule-item"><i class="fa-solid fa-brain"></i><div><h4>100% Habilidade</h4><p>Sem algoritmos de sorte. Você controla e decide quando sacar.</p></div></div>
+            <div class="rule-item"><i class="fa-brands fa-pix" style="color: #00e676;"></i><div><h4>Pagamentos Seguros</h4><p>Depósitos e Saques são processados via PIX com nosso suporte.</p></div></div>
+            <button onclick="aceitarRegras()" style="margin-top: 15px; height: 55px;">EU ENTENDO E CONCORDO</button>
+        </div>
+    </div>
+
+    <div id="custom-modal" class="modal-overlay" style="z-index: 1200;">
+        <div class="modal-box">
+            <div id="modal-icon" style="font-size: 50px; margin-bottom: 15px;"></div>
+            <h2 id="modal-title" style="font-size: 22px; font-weight: 800; margin-bottom: 10px;">Título</h2>
+            <p id="modal-message" style="color: var(--text-muted); font-size: 15px; margin-bottom: 25px;">Mensagem</p>
+            <button id="modal-btn" onclick="fecharModal()">OK</button>
+        </div>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="login-screen" class="screen" style="position: absolute; width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; z-index: 50; background: var(--bg-body);">
+        <div class="card" style="box-shadow: none; border: none; background: transparent;">
+            <h2 style="font-size: 40px; margin-bottom: 10px; font-weight: 900; letter-spacing: -1px;">GP <span>Games</span></h2>
+            <p style="color: var(--text-muted); font-size: 15px; margin-bottom: 40px;">Skill-based Platform</p>
+            <div style="text-align: left; background: var(--bg-card); padding: 25px; border-radius: 20px; border: 1px solid var(--border-main); box-shadow: var(--shadow-card);">
+                <input type="email" id="email-input" placeholder="E-mail" value="jogador@email.com">
+                <input type="password" id="senha-input" placeholder="Senha" value="123456">
+                <button id="btn-login" onclick="window.fazerLoginFirebase()" style="margin-top: 10px; height: 55px;">Entrar na Plataforma</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- APP -->
+    <div id="app-screen" class="hidden">
+        <div class="header">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <button class="btn-icon" onclick="abrirMenu()" style="border: none; box-shadow: none;"><i class="fa-solid fa-bars" style="font-size: 22px;"></i></button>
+                <div class="logo">GP <span>Games</span></div>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <button id="theme-btn" onclick="toggleTheme()" class="btn-icon"><i class="fa-solid fa-moon"></i></button>
+                <div class="balance-badge" onclick="window.atualizarSaldoDoBanco()">
+                    R$ <span id="user-balance">0.00</span>
+                    <i class="fa-solid fa-rotate-right" style="margin-left:5px; font-size:10px; color:var(--text-muted);"></i>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-home" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-box"><span>Nível atual</span><h3>Iniciante</h3></div>
+                <div class="stat-box"><span>Maior Multiplicador</span><h3 class="highlight" id="recorde-display">1.00x</h3></div>
+            </div>
+
+            <div class="game-banner">
+                <div class="game-banner-content">
+                    <span class="badge-skill">100% Habilidade</span>
+                    <h2 style="font-size: 30px; font-weight: 900; color: #fff; margin-bottom: 5px;">Crash Runner</h2>
+                    <p style="color: #ddd; font-size: 13px;">Desvie dos obstáculos e saque antes do Crash.</p>
+                </div>
+            </div>
+            
+            <div class="bet-panel">
+                <h3>Defina o Valor da Entrada</h3>
+                <p>Mínimo exigido de R$ 2,00</p>
+                <div class="quick-amounts">
+                    <button class="btn-quick" onclick="setValor(2)">R$ 2</button>
+                    <button class="btn-quick" onclick="setValor(5)">R$ 5</button>
+                    <button class="btn-quick" onclick="setValor(10)">R$ 10</button>
+                    <button class="btn-quick" onclick="setValor(20)">R$ 20</button>
+                </div>
+                <div class="input-bet-wrapper">
+                    <span>R$</span>
+                    <input type="text" inputmode="decimal" id="bet-input" value="5.00" onblur="formatarDinheiro(this)">
+                </div>
+                <button class="btn-play" onclick="iniciarJogo()"><i class="fa-solid fa-play" style="margin-right: 8px;"></i> JOGAR AGORA</button>
+            </div>
+        </div>
+
+        <div id="tab-ranking" class="tab-content">
+            <div class="ranking-header"><i class="fa-solid fa-trophy"></i><h2>Ranking Semanal</h2><p>Prêmios em saldo real toda sexta-feira!</p></div>
+            <div class="ranking-list">
+                <div class="rank-item"><div class="rank-pos pos-1"><i class="fa-solid fa-crown"></i></div><div class="rank-user">Ga***</div><div class="rank-score">14.50x</div></div>
+                <div class="rank-item"><div class="rank-pos pos-2">2</div><div class="rank-user">Lu***</div><div class="rank-score">9.20x</div></div>
+                <div class="rank-item"><div class="rank-pos pos-3">3</div><div class="rank-user">Ma***</div><div class="rank-score">7.45x</div></div>
+                <div class="rank-item"><div class="rank-pos" style="color: var(--text-muted);">4</div><div class="rank-user">Fe***</div><div class="rank-score">5.10x</div></div>
+            </div>
+        </div>
+
+        <div id="tab-deposit" class="tab-content">
+            <h2 style="font-size: 24px; font-weight: 900; margin-bottom: 10px;">Depositar</h2>
+            <div class="trust-notice"><i class="fa-solid fa-circle-info"></i><div><h4>Transparência GP Games</h4><p>Nosso PIX é processado de maneira manual (Chave Física) para evitarmos taxas de intermediários.</p></div></div>
+            <div class="card" style="text-align: center;">
+                <h4 style="margin-bottom: 15px; font-size: 15px;">1. Copie a Chave PIX:</h4>
+                <div class="pix-box"><div style="font-size: 12px; color: var(--text-muted);">Celular / Email</div><div class="pix-key">contato@gpgames.com.br</div></div>
+                <h4 style="margin-bottom: 15px; font-size: 15px; margin-top: 30px;">2. Avise o Suporte:</h4>
+                <button class="btn-whatsapp" onclick="abrirWhatsApp('deposito')"><i class="fa-brands fa-whatsapp"></i> WhatsApp Suporte</button>
+            </div>
+        </div>
+
+        <div id="tab-withdraw" class="tab-content">
+            <h2 style="font-size: 24px; font-weight: 900; margin-bottom: 10px;">Sacar Lucros</h2>
+            <div class="card">
+                <label style="font-size: 13px; color: var(--text-muted); font-weight: 600;">Valor (R$)</label>
+                <input type="text" inputmode="decimal" placeholder="Ex: 50.00" id="saque-input" onblur="formatarDinheiro(this)">
+                <label style="font-size: 13px; color: var(--text-muted); font-weight: 600;">Sua Chave PIX</label>
+                <input type="text" placeholder="CPF, Celular ou Email" id="chave-pix">
+                <button onclick="solicitarSaqueManual()" style="margin-top: 15px; height: 55px;"><i class="fa-solid fa-money-bill-transfer"></i> Solicitar Saque</button>
+            </div>
+        </div>
+
+        <!-- NAV INFERIOR -->
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="mudarAba('home', this)"><i class="fa-solid fa-gamepad nav-icon"></i><span>Início</span></div>
+            <div class="nav-item" onclick="mudarAba('ranking', this)"><i class="fa-solid fa-ranking-star nav-icon"></i><span>Ranking</span></div>
+            <div class="nav-item" onclick="mudarAba('deposit', this)"><i class="fa-solid fa-circle-arrow-down nav-icon"></i><span>Depositar</span></div>
+            <div class="nav-item" onclick="mudarAba('withdraw', this)"><i class="fa-solid fa-circle-arrow-up nav-icon"></i><span>Sacar</span></div>
+        </div>
+    </div>
+
+    <!-- HUD -->
+    <div id="game-ui" class="hidden">
+        <div id="top-ui"><div id="multiplier-display">1.00x</div><div id="profit-display">Lucro: R$ 5.00</div></div>
+        <div id="bottom-ui"><button id="cashout-btn" onclick="window.sacarMultiplicador()">SACAR AGORA</button></div>
+    </div>
+
+
+    <!-- ================= FIREBASE MODULE INTEGRAÇÃO ================= -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDIyIXf1zK3MY9ws4YoVJ96eFRiiJ3qT8A",
+            authDomain: "habilidade-9fef6.firebaseapp.com",
+            projectId: "habilidade-9fef6",
+            storageBucket: "habilidade-9fef6.firebasestorage.app",
+            messagingSenderId: "852848424405",
+            appId: "1:852848424405:web:e3b728c06205c43170f95c",
+            measurementId: "G-5RW1LKV54N"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Variáveis de Estado (agora atreladas ao banco)
+        window.saldo = 0.00;
+        window.recordeMultiplicador = 1.00;
+        window.currentUser = null;
+        let valorAposta = 5.00;
+        const numeroWhatsApp = "5519999999999"; 
+        
+        let jogoRodando = false, multiplicador = 1.00, velocidadeBase = 0.50; 
+        let faixaAtual = 0, targetX = 0, targetY = 0.6, isJumping = false;
+        let pularTimeout1, pularTimeout2, gameLoopInterval, obstacleTimeout; 
+
+        // Monitora o estado de Login
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                window.currentUser = user;
+                document.getElementById('user-display-email').innerText = user.email;
+                await puxarDadosDoBanco();
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('welcome-modal').classList.add('active');
+            } else {
+                window.currentUser = null;
+                document.getElementById('login-screen').classList.remove('hidden');
+                document.getElementById('app-screen').classList.add('hidden');
+                document.getElementById('welcome-modal').classList.remove('active');
+            }
+        });
+
+        // Função de Login/Registro automático
+        window.fazerLoginFirebase = async function() {
+            const email = document.getElementById('email-input').value;
+            const senha = document.getElementById('senha-input').value;
+            const btn = document.getElementById('btn-login');
+            btn.innerText = "Carregando...";
+            
+            try {
+                // Tenta logar primeiro
+                await signInWithEmailAndPassword(auth, email, senha);
+            } catch (error) {
+                // Se o usuário não existir, cria a conta na hora
+                if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+                    try {
+                        const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
+                        // Cria o documento zerado no banco
+                        await setDoc(doc(db, "usuarios", userCredential.user.uid), {
+                            email: email,
+                            saldo: 0.00, // Começa com zero. Depósitos você edita no Console do Firebase.
+                            recorde: 1.00
+                        });
+                    } catch (errReg) {
+                        alert("Erro ao criar conta: " + errReg.message);
+                    }
+                } else {
+                    alert("Erro no login: " + error.message);
+                }
+            }
+            btn.innerText = "Entrar na Plataforma";
+        };
+
+        window.sairDaConta = function() {
+            signOut(auth);
+        };
+
+        async function puxarDadosDoBanco() {
+            if(!window.currentUser) return;
+            const docRef = doc(db, "usuarios", window.currentUser.uid);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                window.saldo = docSnap.data().saldo || 0;
+                window.recordeMultiplicador = docSnap.data().recorde || 1.00;
+            }
+            atualizarUI();
+        }
+
+        // Função extra para o usuário puxar o saldo atualizado (caso vc edite no Firebase)
+        window.atualizarSaldoDoBanco = async function() {
+            await puxarDadosDoBanco();
+            mostrarModal('Atualizado', 'Seu saldo foi sincronizado com o banco de dados.', 'sucesso');
+        }
+
+        async function salvarSaldoNoBanco(novoSaldo) {
+            window.saldo = novoSaldo;
+            atualizarUI();
+            if(window.currentUser) {
+                await updateDoc(doc(db, "usuarios", window.currentUser.uid), { saldo: window.saldo });
+            }
+        }
+
+        async function salvarRecordeNoBanco(novoRecorde) {
+            window.recordeMultiplicador = novoRecorde;
+            document.getElementById('recorde-display').innerText = window.recordeMultiplicador.toFixed(2) + 'x';
+            if(window.currentUser) {
+                await updateDoc(doc(db, "usuarios", window.currentUser.uid), { recorde: window.recordeMultiplicador });
+            }
+        }
+
+        function atualizarUI() { 
+            document.getElementById('user-balance').innerText = window.saldo.toFixed(2); 
+            document.getElementById('recorde-display').innerText = window.recordeMultiplicador.toFixed(2) + 'x';
+        }
+
+        // ================= FUNÇÕES DA INTERFACE (Exportadas para janela Global) =================
+        window.abrirMenu = function() { document.getElementById('sidebar').classList.add('active'); document.getElementById('sidebar-overlay').classList.add('active'); }
+        window.fecharMenu = function() { document.getElementById('sidebar').classList.remove('active'); document.getElementById('sidebar-overlay').classList.remove('active'); }
+        window.setValor = function(val) { document.getElementById('bet-input').value = val.toFixed(2); }
+        window.formatarDinheiro = function(campo) {
+            let valorReal = parseFloat(campo.value.replace(',', '.'));
+            if(isNaN(valorReal) || valorReal <= 0) { campo.value = ''; return; }
+            campo.value = valorReal.toFixed(2);
+        }
+        window.toggleTheme = function() {
+            document.body.classList.toggle('light-mode'); const isLight = document.body.classList.contains('light-mode');
+            document.getElementById('theme-btn').innerHTML = isLight ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+            document.getElementById('game-sky').setAttribute('color', isLight ? '#f3f4f6' : '#0b0e14');
+        }
+
+        window.mostrarModal = function(titulo, mensagem, tipo) {
+            const modal = document.getElementById('custom-modal'), btn = document.getElementById('modal-btn'), iconDiv = document.getElementById('modal-icon');
+            document.getElementById('modal-title').innerHTML = titulo; document.getElementById('modal-message').innerHTML = mensagem;
+            if(tipo === 'erro') { iconDiv.innerHTML = '<i class="fa-solid fa-circle-xmark" style="color: #ff3333;"></i>'; btn.style.background = 'linear-gradient(90deg, #ff3333 0%, #ff5555 100%)'; btn.style.color = '#fff'; } 
+            else if (tipo === 'sucesso') { iconDiv.innerHTML = '<i class="fa-solid fa-circle-check" style="color: #00e676;"></i>'; btn.style.background = 'linear-gradient(90deg, #00d26a 0%, #00e676 100%)'; btn.style.color = '#0b0e14'; } 
+            else { iconDiv.innerHTML = '<i class="fa-solid fa-circle-exclamation" style="color: #ffaa00;"></i>'; btn.style.background = 'var(--border-solid)'; btn.style.color = 'var(--text-main)'; }
+            modal.classList.add('active');
+        }
+        window.fecharModal = function() { document.getElementById('custom-modal').classList.remove('active'); }
+
+        window.aceitarRegras = function() { document.getElementById('welcome-modal').classList.remove('active'); document.getElementById('app-screen').classList.remove('hidden'); atualizarUI(); };
+
+        window.mudarAba = function(aba, elemento) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById(`tab-${aba}`).classList.add('active'); elemento.classList.add('active');
+        }
+
+        window.abrirWhatsApp = function(tipo) { window.open(`https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent((tipo === 'deposito') ? "Olá Suporte, fiz um PIX para adicionar saldo na plataforma. Meu email de cadastro é: " + (window.currentUser ? window.currentUser.email : "") + ". Segue o comprovante:" : "")}`, '_blank'); };
+        window.solicitarSaqueManual = function() {
+            let valor = parseFloat(document.getElementById('saque-input').value.replace(',', '.')), chave = document.getElementById('chave-pix').value;
+            if(!valor || valor <= 0) return window.mostrarModal('Atenção', 'Digite um valor válido.', 'aviso');
+            if(!chave) return window.mostrarModal('Atenção', 'Digite a chave PIX.', 'aviso');
+            if(valor > window.saldo) return window.mostrarModal('Erro de Saldo', 'Saldo insuficiente.', 'erro');
+            
+            // Subtrai o valor do banco e abre o WhatsApp
+            salvarSaldoNoBanco(window.saldo - valor);
+            window.open(`https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(`Solicito saque de R$ ${valor.toFixed(2)}. Chave PIX:${chave}. Email logado: ${window.currentUser.email}`)}`, '_blank');
+            document.getElementById('saque-input').value = ''; document.getElementById('chave-pix').value = '';
+        };
+
+        // ================= MOTOR DO JOGO LOGADO =================
+        window.iniciarJogo = async function() {
+            let input = document.getElementById('bet-input'); window.formatarDinheiro(input); valorAposta = parseFloat(input.value);
+            if(isNaN(valorAposta) || valorAposta < 2) return window.mostrarModal('Aviso', 'A entrada mínima é de R$ 2,00', 'aviso');
+            if(window.saldo < valorAposta) return window.mostrarModal('Saldo Insuficiente', 'Faça um depósito para jogar.', 'erro');
+            
+            // DESCONTA A APOSTA NO BANCO DE DADOS
+            await salvarSaldoNoBanco(window.saldo - valorAposta);
+            
+            document.getElementById('app-screen').classList.add('hidden'); document.getElementById('game-ui').classList.remove('hidden');
+            document.getElementById('multiplier-display').classList.remove('turbo-mode'); document.getElementById('multiplier-display').style.color = '#00d26a';
+            
+            multiplicador = 1.00; velocidadeBase = 0.50; faixaAtual = 0; targetX = 0; targetY = 0.6; isJumping = false;
+            document.getElementById('player').setAttribute('position', '0 0.6 0');
+            jogoRodando = true; document.querySelectorAll('.obstacle').forEach(obs => obs.remove());
+            gameLoopInterval = setInterval(gameLoop, 1000 / 60); agendarObstaculo(); 
+        };
+
+        function agendarObstaculo() {
+            if (!jogoRodando) return;
+            gerarObstaculo();
+            let tempoAtual = (multiplicador >= 1.05) ? Math.max(450, 750 - ((multiplicador - 1.05) * 1000)) : 750;
+            obstacleTimeout = setTimeout(agendarObstaculo, tempoAtual);
+        }
+
+        function gameLoop() {
+            if (!jogoRodando) return;
+            multiplicador += 0.0020; 
+            
+            if (multiplicador >= 1.05) { 
+                velocidadeBase += 0.0015; 
+                document.getElementById('multiplier-display').classList.add('turbo-mode'); 
+            } else { 
+                velocidadeBase += 0.0004; 
+            }
+            
+            document.getElementById('multiplier-display').innerText = multiplicador.toFixed(2) + 'x';
+            document.getElementById('profit-display').innerText = 'Lucro: R$ ' + (valorAposta * multiplicador).toFixed(2);
+
+            const pEl = document.getElementById('player'); let pPos = pEl.getAttribute('position');
+            let newX = pPos.x + (targetX - pPos.x) * 0.65, newY = pPos.y + (targetY - pPos.y) * 0.40;
+            pEl.setAttribute('position', `${newX.toFixed(3)} ${newY.toFixed(3)} 0`);
+
+            document.querySelectorAll('.obstacle').forEach(obs => {
+                let pos = obs.getAttribute('position'); pos.z += velocidadeBase; obs.setAttribute('position', pos);
+                let obsX = parseInt(obs.getAttribute('data-faixa')) * 2; 
+                if (pos.z > -1.5 && pos.z < 1.5 && Math.abs(newX - obsX) < 0.8 && newY < 1.5) bater();
+                if (pos.z > 5) obs.remove();
+            });
+        }
+
+        function gerarObstaculo() {
+            if (!jogoRodando) return;
+            let chanceDuplo = (multiplicador > 1.02) ? 0.20 : 0;
+            if (multiplicador >= 1.05) chanceDuplo = 0.60; 
+            
+            let faixas = [-1, 0, 1].sort(() => Math.random() - 0.5);
+            let qtd = (Math.random() < chanceDuplo) ? 2 : 1;
+            
+            for(let i = 0; i < qtd; i++) {
+                const obs = document.createElement('a-box');
+                obs.setAttribute('class', 'obstacle'); obs.setAttribute('color', '#ff3333'); 
+                obs.setAttribute('depth', '1'); obs.setAttribute('height', '1.5'); obs.setAttribute('width', '1.5');
+                obs.setAttribute('data-faixa', faixas[i]); obs.setAttribute('position', `${faixas[i] * 2} 0.75 -50`); 
+                document.querySelector('a-scene').appendChild(obs);
+            }
+        }
+
+        let touchStartX = 0, touchStartY = 0;
+        document.addEventListener('touchstart', e => { if(e.target.id === 'cashout-btn') return; touchStartX = e.touches[0].clientX; touchStartY = e.touches[0].clientY; }, {passive: false});
+        document.addEventListener('touchend', e => {
+            if (!jogoRodando || e.target.id === 'cashout-btn') return;
+            let dx = e.changedTouches[0].clientX - touchStartX, dy = e.changedTouches[0].clientY - touchStartY;
+            if (Math.abs(dx) > Math.abs(dy)) { if (dx > 30 && faixaAtual < 1) mover(1); else if (dx < -30 && faixaAtual > -1) mover(-1); } 
+            else { if (dy < -30 && !isJumping) pular(); }
+        });
+        document.addEventListener('keydown', (e) => {
+            if (!jogoRodando) return;
+            if ((e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') && faixaAtual < 1) mover(1);
+            if ((e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') && faixaAtual > -1) mover(-1);
+            if ((e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W' || e.key === ' ') && !isJumping) pular();
+        });
+
+        function mover(direcao) { faixaAtual += direcao; targetX = faixaAtual * 2; }
+        function pular() {
+            isJumping = true; targetY = 2.8; clearTimeout(pularTimeout1); clearTimeout(pularTimeout2);
+            pularTimeout1 = setTimeout(() => { targetY = 0.6; pularTimeout2 = setTimeout(() => { isJumping = false; }, 200); }, 250);
+        }
+
+        window.sacarMultiplicador = async function() {
+            if (!jogoRodando) return;
+            jogoRodando = false; 
+            let lucro = valorAposta * multiplicador; 
+            
+            // ADICIONA O LUCRO NO BANCO DE DADOS
+            await salvarSaldoNoBanco(window.saldo + lucro);
+            
+            if(multiplicador > window.recordeMultiplicador) { 
+                await salvarRecordeNoBanco(multiplicador); 
+            }
+            
+            document.getElementById('multiplier-display').style.color = '#00d26a';
+            encerrarPartida('sucesso', lucro);
+        };
+        
+        function bater() { jogoRodando = false; document.getElementById('multiplier-display').style.color = '#ff3333'; encerrarPartida('erro', 0); }
+        
+        function encerrarPartida(status, lucro) {
+            clearInterval(gameLoopInterval); clearTimeout(obstacleTimeout); 
+            setTimeout(() => {
+                document.getElementById('game-ui').classList.add('hidden'); document.getElementById('app-screen').classList.remove('hidden'); atualizarUI();
+                if(status === 'sucesso') window.mostrarModal('Vitória!', `Você sacou em <b style="color: #00e676;">${multiplicador.toFixed(2)}x</b><br>e faturou <b>R$ ${lucro.toFixed(2)}</b>!`, 'sucesso');
+                else window.mostrarModal('Crash!', `Você bateu em <b style="color: #ff3333;">${multiplicador.toFixed(2)}x</b><br>e perdeu a aposta.`, 'erro');
+            }, 250);
+        }
+    </script>
+</body>
+</html>
