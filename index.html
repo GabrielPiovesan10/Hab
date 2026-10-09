@@ -28,14 +28,16 @@
             --trust-bg: #fffbf0; --trust-border: #fcd34d;
         }
 
-        /* ================= ESTILOS GERAIS ================= */
+        /* ================= ESTILOS GERAIS (BLINDAGEM DO SCROLL) ================= */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         
-        body { 
+        html, body { 
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            width: 100%; height: 100%;
             background-color: var(--bg-body); 
             color: var(--text-main); 
-            overflow: hidden; 
-            overscroll-behavior: none; 
+            overflow: hidden; /* Trava o scroll do body (evita que o app suba inteiro) */
+            overscroll-behavior: none; /* Remove o puxar para atualizar */
             transition: background-color 0.3s; 
         }
         
@@ -64,20 +66,27 @@
         .btn-whatsapp { background: linear-gradient(90deg, #25D366 0%, #128C7E 100%); color: white; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.2); }
         .btn-icon { width: 40px; height: 40px; padding: 0; margin: 0; border-radius: 50%; background: transparent; border: 1px solid var(--border-solid); color: var(--text-main); box-shadow: none; display: flex; justify-content: center; align-items: center; font-size: 16px; transition: 0.3s; }
 
-        /* ================= TELA DE LOGIN & REGISTRO ================= */
+        /* ================= TELAS PRINCIPAIS ================= */
+        .screen {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            width: 100%; height: 100%;
+        }
+
+        /* TELA DE LOGIN & REGISTRO */
         #login-screen { 
-            position: absolute; top: 0; left: 0; width: 100vw; height: 100dvh; 
-            display: flex; justify-content: center; /* Removido align-items: center para não cortar o topo no celular */
-            z-index: 50; background: var(--bg-body); padding: 40px 20px;
-            overflow-y: auto; touch-action: auto; 
-            -webkit-overflow-scrolling: touch; /* Scroll suave de momentum no iOS/Android */
-            overscroll-behavior-y: contain; /* Evita o puxar-para-atualizar da página inteira */
+            z-index: 50; 
+            background: var(--bg-body); 
+            overflow-y: auto; /* Permite rolar apenas o conteúdo interno */
+            -webkit-overflow-scrolling: touch; /* Scroll suave estilo app nativo */
+        }
+        
+        .auth-wrapper {
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            min-height: 100%; padding: 40px 20px;
         }
 
         .auth-container {
-            width: 100%; max-width: 400px;
-            margin: auto; /* Centraliza verticalmente apenas quando a tela for maior que o conteúdo */
-            flex-shrink: 0; /* Impede a caixa de ser esmagada */
+            width: 100%; max-width: 400px; flex-shrink: 0;
         }
 
         .auth-box {
@@ -86,51 +95,63 @@
             text-align: left;
         }
 
-        /* ================= MENU LATERAL ================= */
-        .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 1000; opacity: 0; pointer-events: none; transition: 0.3s; }
-        .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
+        /* PLATAFORMA APP */
+        #app-screen { 
+            z-index: 10; 
+            background: var(--bg-body); 
+            display: flex; flex-direction: column; 
+        }
         
-        .sidebar { position: fixed; top: 0; left: -300px; width: 280px; height: 100vh; background: var(--nav-bg); backdrop-filter: blur(20px); border-right: 1px solid var(--border-main); z-index: 1001; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.05); display: flex; flex-direction: column; padding: 20px; padding-top: max(20px, env(safe-area-inset-top)); }
-        .sidebar.active { left: 0; }
-        .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid var(--border-solid); padding-bottom: 15px; }
-        .sidebar-menu { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-        .sidebar-menu li { display: flex; align-items: center; gap: 15px; font-size: 16px; font-weight: 600; color: var(--text-main); padding: 12px; border-radius: 10px; cursor: pointer; transition: 0.2s; }
-        .sidebar-menu li:active { background: var(--border-main); }
-        .sidebar-menu li i { color: #00e676; font-size: 20px; width: 25px; text-align: center; }
-
-        .profile-li { align-items: center !important; }
-        .profile-info { display: flex; flex-direction: column; width: calc(100% - 40px); overflow: hidden; }
-        .profile-title { font-size: 16px; font-weight: 600; }
-        .profile-email { font-size: 12px; color: var(--text-muted); font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
-
-        /* ================= MODAIS ================= */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: var(--modal-overlay); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 1100; opacity: 0; pointer-events: none; transition: 0.3s ease; }
-        .modal-overlay.active { opacity: 1; pointer-events: auto; }
-        .modal-box { background: var(--bg-card); padding: 30px 25px; border-radius: 24px; width: 88%; max-width: 380px; text-align: center; position: relative; border: 1px solid var(--border-main); box-shadow: 0 20px 50px rgba(0,0,0,0.3); transform: translateY(20px); transition: 0.3s; max-height: 90dvh; overflow-y: auto; touch-action: auto; -webkit-overflow-scrolling: touch; color: var(--text-main); }
-        .modal-overlay.active .modal-box { transform: translateY(0); }
-        
-        .welcome-header { font-size: 50px; color: #00e676; margin-bottom: 15px; }
-        .welcome-title { font-size: 24px; font-weight: 900; margin-bottom: 15px; }
-        .rule-item { display: flex; align-items: flex-start; gap: 15px; text-align: left; background: var(--input-bg); padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--border-solid); }
-        .rule-item i { color: #00e676; font-size: 20px; margin-top: 2px; }
-        .rule-item h4 { font-size: 15px; margin-bottom: 6px; font-weight: 700; }
-        .rule-item p { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
-
-        /* ================= PLATAFORMA APP ================= */
-        #app-screen { position: absolute; top: 0; left: 0; width: 100vw; height: 100dvh; display: flex; flex-direction: column; background: var(--bg-body); z-index: 10; transition: 0.3s; }
-        .header { padding: 15px 20px; padding-top: max(15px, env(safe-area-inset-top)); background: var(--nav-bg); backdrop-filter: blur(10px); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-main); position: sticky; top: 0; z-index: 20; }
+        .header { 
+            padding: 15px 20px; padding-top: max(15px, env(safe-area-inset-top)); 
+            background: var(--nav-bg); backdrop-filter: blur(10px); 
+            display: flex; justify-content: space-between; align-items: center; 
+            border-bottom: 1px solid var(--border-main); flex-shrink: 0;
+        }
         .logo { font-size: 20px; font-weight: 900; letter-spacing: -0.5px; }
         .logo span { color: #00d26a; }
         .balance-badge { background: var(--input-bg); color: #00e676; padding: 8px 14px; border-radius: 20px; font-weight: 800; font-size: 14px; border: 1px solid var(--border-solid); display: flex; align-items: center; gap: 8px; cursor: pointer; }
 
         .tab-content { 
-            flex: 1; overflow-y: auto; touch-action: auto; 
-            -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain;
+            flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; 
             padding: 20px; padding-bottom: 120px; display: none; 
         }
         .tab-content.active { display: block; animation: fadeUp 0.4s ease; }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
+        .bottom-nav { 
+            position: absolute; bottom: 0; left: 0; right: 0; 
+            height: calc(75px + env(safe-area-inset-bottom)); 
+            background: var(--nav-bg); backdrop-filter: blur(15px); 
+            display: flex; justify-content: space-between; align-items: center; 
+            border-top: 1px solid var(--border-main); padding: 0 10px; padding-bottom: env(safe-area-inset-bottom); 
+            z-index: 20; flex-shrink: 0;
+        }
+        .nav-item { color: var(--text-muted); display: flex; flex-direction: column; align-items: center; font-size: 10px; font-weight: 700; width: 25%; cursor: pointer; transition: 0.2s; }
+        .nav-item.active { color: #00e676; }
+        .nav-icon { font-size: 20px; margin-bottom: 6px; transition: 0.2s; }
+        .nav-item.active .nav-icon { transform: translateY(-3px); }
+
+        /* ================= HUD DO JOGO & ENGINE ================= */
+        #game-container { 
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 1; 
+            touch-action: none; 
+        }
+        
+        /* Essa classe garante que o 3D não sangre na interface e não coma toques */
+        .game-hidden {
+            opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; z-index: -10 !important;
+        }
+        
+        #game-ui { position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 5; }
+        #top-ui { position: absolute; top: max(8vh, env(safe-area-inset-top)); left: 0; width: 100%; text-align: center; }
+        #multiplier-display { font-size: 80px; font-weight: 900; color: #00d26a; text-shadow: 0 4px 20px rgba(0, 210, 106, 0.3); letter-spacing: -3px; }
+        .turbo-mode { color: #ff3333 !important; text-shadow: 0 4px 30px rgba(255, 51, 51, 0.6) !important; transform: scale(1.03); }
+        #profit-display { display: inline-block; margin-top: -10px; padding: 8px 20px; border-radius: 20px; font-size: 18px; font-weight: 800; color: #fff; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+        #bottom-ui { position: absolute; bottom: max(35px, env(safe-area-inset-bottom)); left: 0; width: 100%; padding: 0 25px; text-align: center; }
+        #cashout-btn { pointer-events: auto; background: linear-gradient(90deg, #ff9900 0%, #ffaa00 100%); color: #0b0e14; font-size: 22px; height: 75px; border-radius: 16px; font-weight: 900; margin: 0; }
+
+        /* ================= COMPONENTES INTERNOS ================= */
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
         .stat-box { background: var(--bg-card); padding: 15px; border-radius: 16px; border: 1px solid var(--border-solid); text-align: left; position: relative; overflow: hidden; transition: 0.3s; }
         .stat-box span { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
@@ -171,30 +192,41 @@
         .pix-box { background: var(--input-bg); border: 1px dashed var(--border-solid); padding: 20px; border-radius: 12px; margin-bottom: 20px; }
         .pix-key { font-size: 18px; color: #00e676; font-weight: 800; letter-spacing: 1px; margin: 10px 0; user-select: all; }
 
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: calc(75px + env(safe-area-inset-bottom)); background: var(--nav-bg); backdrop-filter: blur(15px); display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-main); padding: 0 10px; padding-bottom: env(safe-area-inset-bottom); z-index: 20; }
-        .nav-item { color: var(--text-muted); display: flex; flex-direction: column; align-items: center; font-size: 10px; font-weight: 700; width: 25%; cursor: pointer; transition: 0.2s; }
-        .nav-item.active { color: #00e676; }
-        .nav-icon { font-size: 20px; margin-bottom: 6px; transition: 0.2s; }
-        .nav-item.active .nav-icon { transform: translateY(-3px); }
+        /* ================= MENU LATERAL ================= */
+        .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 1000; opacity: 0; pointer-events: none; transition: 0.3s; }
+        .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
+        
+        .sidebar { position: fixed; top: 0; left: -300px; width: 280px; height: 100vh; background: var(--nav-bg); backdrop-filter: blur(20px); border-right: 1px solid var(--border-main); z-index: 1001; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.05); display: flex; flex-direction: column; padding: 20px; padding-top: max(20px, env(safe-area-inset-top)); }
+        .sidebar.active { left: 0; }
+        .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid var(--border-solid); padding-bottom: 15px; }
+        .sidebar-menu { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+        .sidebar-menu li { display: flex; align-items: center; gap: 15px; font-size: 16px; font-weight: 600; color: var(--text-main); padding: 12px; border-radius: 10px; cursor: pointer; transition: 0.2s; }
+        .sidebar-menu li:active { background: var(--border-main); }
+        .sidebar-menu li i { color: #00e676; font-size: 20px; width: 25px; text-align: center; }
 
-        /* ================= HUD DO JOGO ================= */
-        #game-container { 
-            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; 
-            touch-action: none; /* Mantém o bloqueio de scroll somente na tela do jogo 3D */
-        }
-        #game-ui { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 5; }
-        #top-ui { position: absolute; top: max(8vh, env(safe-area-inset-top)); left: 0; width: 100%; text-align: center; }
-        #multiplier-display { font-size: 80px; font-weight: 900; color: #00d26a; text-shadow: 0 4px 20px rgba(0, 210, 106, 0.3); letter-spacing: -3px; }
-        .turbo-mode { color: #ff3333 !important; text-shadow: 0 4px 30px rgba(255, 51, 51, 0.6) !important; transform: scale(1.03); }
-        #profit-display { display: inline-block; margin-top: -10px; padding: 8px 20px; border-radius: 20px; font-size: 18px; font-weight: 800; color: #fff; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
-        #bottom-ui { position: absolute; bottom: max(35px, env(safe-area-inset-bottom)); left: 0; width: 100%; padding: 0 25px; text-align: center; }
-        #cashout-btn { pointer-events: auto; background: linear-gradient(90deg, #ff9900 0%, #ffaa00 100%); color: #0b0e14; font-size: 22px; height: 75px; border-radius: 16px; font-weight: 900; margin: 0; }
+        .profile-li { align-items: center !important; }
+        .profile-info { display: flex; flex-direction: column; width: calc(100% - 40px); overflow: hidden; }
+        .profile-title { font-size: 16px; font-weight: 600; }
+        .profile-email { font-size: 12px; color: var(--text-muted); font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+
+        /* ================= MODAIS ================= */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: var(--modal-overlay); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 1100; opacity: 0; pointer-events: none; transition: 0.3s ease; }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-box { background: var(--bg-card); padding: 30px 25px; border-radius: 24px; width: 88%; max-width: 380px; text-align: center; position: relative; border: 1px solid var(--border-main); box-shadow: 0 20px 50px rgba(0,0,0,0.3); transform: translateY(20px); transition: 0.3s; max-height: 90dvh; overflow-y: auto; touch-action: auto; -webkit-overflow-scrolling: touch; color: var(--text-main); }
+        .modal-overlay.active .modal-box { transform: translateY(0); }
+        
+        .welcome-header { font-size: 50px; color: #00e676; margin-bottom: 15px; }
+        .welcome-title { font-size: 24px; font-weight: 900; margin-bottom: 15px; }
+        .rule-item { display: flex; align-items: flex-start; gap: 15px; text-align: left; background: var(--input-bg); padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--border-solid); }
+        .rule-item i { color: #00e676; font-size: 20px; margin-top: 2px; }
+        .rule-item h4 { font-size: 15px; margin-bottom: 6px; font-weight: 700; }
+        .rule-item p { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
     </style>
 </head>
 <body>
 
-    <!-- 3D ENGINE -->
-    <div id="game-container">
+    <!-- 3D ENGINE (Oculto via .game-hidden quando não está jogando) -->
+    <div id="game-container" class="game-hidden">
         <a-scene embedded vr-mode-ui="enabled: false">
             <a-sky id="game-sky" color="#0b0e14"></a-sky>
             <a-light type="directional" position="-1 2 1" intensity="0.8"></a-light>
@@ -267,45 +299,46 @@
 
     <!-- TELA DE LOGIN & REGISTRO -->
     <div id="login-screen" class="screen">
-        <div class="auth-container">
-            <h2 style="font-size: 40px; margin-bottom: 5px; font-weight: 900; letter-spacing: -1px; text-align: center;">GP <span>Games</span></h2>
-            <p style="color: var(--text-muted); font-size: 15px; margin-bottom: 30px; text-align: center;">Skill-based Platform</p>
-            
-            <!-- CAIXA DE LOGIN -->
-            <div id="form-login" class="auth-box">
-                <h3 style="margin-bottom: 20px; font-size: 20px; font-weight: 800;">Fazer Login</h3>
+        <div class="auth-wrapper">
+            <div class="auth-container">
+                <h2 style="font-size: 40px; margin-bottom: 5px; font-weight: 900; letter-spacing: -1px; text-align: center;">GP <span>Games</span></h2>
+                <p style="color: var(--text-muted); font-size: 15px; margin-bottom: 30px; text-align: center;">Skill-based Platform</p>
                 
-                <input type="email" id="email-login" placeholder="Digite seu e-mail">
-                <input type="password" id="senha-login" placeholder="Digite sua senha">
-                
-                <button id="btn-login" onclick="window.fazerLoginFirebase()" style="height: 55px; margin-top: 15px;">Entrar na Plataforma</button>
-                
-                <div style="text-align: center; margin-top: 25px;">
-                    <span style="color: var(--text-muted); font-size: 14px;">Não tem uma conta?</span>
-                    <a href="#" onclick="window.alternarTelasAuth('registro')" style="color: #00e676; font-weight: 700; text-decoration: none; margin-left: 5px; font-size: 14px;">Criar nova conta</a>
+                <!-- CAIXA DE LOGIN -->
+                <div id="form-login" class="auth-box">
+                    <h3 style="margin-bottom: 20px; font-size: 20px; font-weight: 800;">Fazer Login</h3>
+                    
+                    <input type="email" id="email-login" placeholder="Digite seu e-mail">
+                    <input type="password" id="senha-login" placeholder="Digite sua senha">
+                    
+                    <button id="btn-login" onclick="window.fazerLoginFirebase()" style="height: 55px; margin-top: 15px;">Entrar na Plataforma</button>
+                    
+                    <div style="text-align: center; margin-top: 25px;">
+                        <span style="color: var(--text-muted); font-size: 14px;">Não tem uma conta?</span>
+                        <a href="#" onclick="window.alternarTelasAuth('registro')" style="color: #00e676; font-weight: 700; text-decoration: none; margin-left: 5px; font-size: 14px;">Criar nova conta</a>
+                    </div>
+                </div>
+
+                <!-- CAIXA DE REGISTRO -->
+                <div id="form-registro" class="auth-box hidden">
+                    <h3 style="margin-bottom: 20px; font-size: 20px; font-weight: 800;">Criar Nova Conta</h3>
+                    
+                    <input type="email" id="email-registro" placeholder="Cadastre seu melhor e-mail">
+                    <input type="password" id="senha-registro" placeholder="Crie uma senha (mínimo 6 letras)">
+                    
+                    <button id="btn-registro" onclick="window.criarContaFirebase()" style="height: 55px; margin-top: 15px;">Finalizar Cadastro</button>
+                    
+                    <div style="text-align: center; margin-top: 25px;">
+                        <span style="color: var(--text-muted); font-size: 14px;">Já possui conta?</span>
+                        <a href="#" onclick="window.alternarTelasAuth('login')" style="color: #00e676; font-weight: 700; text-decoration: none; margin-left: 5px; font-size: 14px;">Fazer Login</a>
+                    </div>
                 </div>
             </div>
-
-            <!-- CAIXA DE REGISTRO -->
-            <div id="form-registro" class="auth-box hidden">
-                <h3 style="margin-bottom: 20px; font-size: 20px; font-weight: 800;">Criar Nova Conta</h3>
-                
-                <input type="email" id="email-registro" placeholder="Cadastre seu melhor e-mail">
-                <input type="password" id="senha-registro" placeholder="Crie uma senha (mínimo 6 letras)">
-                
-                <button id="btn-registro" onclick="window.criarContaFirebase()" style="height: 55px; margin-top: 15px;">Finalizar Cadastro</button>
-                
-                <div style="text-align: center; margin-top: 25px;">
-                    <span style="color: var(--text-muted); font-size: 14px;">Já possui conta?</span>
-                    <a href="#" onclick="window.alternarTelasAuth('login')" style="color: #00e676; font-weight: 700; text-decoration: none; margin-left: 5px; font-size: 14px;">Fazer Login</a>
-                </div>
-            </div>
-
         </div>
     </div>
 
-    <!-- APP -->
-    <div id="app-screen" class="hidden">
+    <!-- APP PRINCIPAL -->
+    <div id="app-screen" class="hidden screen">
         <div class="header">
             <div style="display: flex; align-items: center; gap: 15px;">
                 <button class="btn-icon" onclick="window.abrirMenu()" style="border: none; box-shadow: none;"><i class="fa-solid fa-bars" style="font-size: 22px;"></i></button>
@@ -413,7 +446,6 @@
         <div id="bottom-ui"><button id="cashout-btn" onclick="window.sacarMultiplicador()">SACAR AGORA</button></div>
     </div>
 
-
     <!-- ================= FIREBASE MODULE INTEGRAÇÃO ================= -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
@@ -444,11 +476,9 @@
         let faixaAtual = 0, targetX = 0, targetY = 0.6, isJumping = false;
         let pularTimeout1, pularTimeout2, gameLoopInterval, obstacleTimeout; 
 
-        // ================= FUNÇÕES DE NAVEGAÇÃO AUTH =================
         window.alternarTelasAuth = function(tela) {
             const loginBox = document.getElementById('form-login');
             const regBox = document.getElementById('form-registro');
-            
             document.getElementById('login-screen').scrollTo({ top: 0, behavior: 'smooth' });
 
             if(tela === 'registro') {
@@ -460,7 +490,6 @@
             }
         };
 
-        // Monitora o estado de Login
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 window.currentUser = user;
@@ -481,7 +510,6 @@
             }
         });
 
-        // 1. FUNÇÃO DE LOGIN
         window.fazerLoginFirebase = async function() {
             const email = document.getElementById('email-login').value.trim();
             const senha = document.getElementById('senha-login').value;
@@ -499,7 +527,6 @@
             btn.innerText = "Entrar na Plataforma";
         };
 
-        // 2. FUNÇÃO DE CRIAR CONTA
         window.criarContaFirebase = async function() {
             const email = document.getElementById('email-registro').value.trim();
             const senha = document.getElementById('senha-registro').value;
@@ -571,7 +598,6 @@
             document.getElementById('recorde-display').innerText = window.recordeMultiplicador.toFixed(2) + 'x';
         }
 
-        // ================= FUNÇÕES DA INTERFACE GERAL =================
         window.abrirMenu = function() { document.getElementById('sidebar').classList.add('active'); document.getElementById('sidebar-overlay').classList.add('active'); }
         window.fecharMenu = function() { document.getElementById('sidebar').classList.remove('active'); document.getElementById('sidebar-overlay').classList.remove('active'); }
         window.setValor = function(val) { document.getElementById('bet-input').value = val.toFixed(2); }
@@ -616,7 +642,6 @@
             document.getElementById('saque-input').value = ''; document.getElementById('chave-pix').value = '';
         };
 
-        // ================= MOTOR DO JOGO =================
         window.iniciarJogo = async function() {
             let input = document.getElementById('bet-input'); window.formatarDinheiro(input); valorAposta = parseFloat(input.value);
             if(isNaN(valorAposta) || valorAposta < 2) return window.mostrarModal('Aviso', 'A entrada mínima é de R$ 2,00', 'aviso');
@@ -624,7 +649,10 @@
             
             await salvarSaldoNoBanco(window.saldo - valorAposta);
             
-            document.getElementById('app-screen').classList.add('hidden'); document.getElementById('game-ui').classList.remove('hidden');
+            // Revela a tela 3D e esconde a interface inicial
+            document.getElementById('game-container').classList.remove('game-hidden');
+            document.getElementById('app-screen').classList.add('hidden'); 
+            document.getElementById('game-ui').classList.remove('hidden');
             document.getElementById('multiplier-display').classList.remove('turbo-mode'); document.getElementById('multiplier-display').style.color = '#00d26a';
             
             multiplicador = 1.00; velocidadeBase = 0.50; faixaAtual = 0; targetX = 0; targetY = 0.6; isJumping = false;
@@ -718,7 +746,12 @@
         function encerrarPartida(status, lucro) {
             clearInterval(gameLoopInterval); clearTimeout(obstacleTimeout); 
             setTimeout(() => {
-                document.getElementById('game-ui').classList.add('hidden'); document.getElementById('app-screen').classList.remove('hidden'); atualizarUI();
+                // Esconde a tela 3D e revela a interface inicial
+                document.getElementById('game-container').classList.add('game-hidden');
+                document.getElementById('game-ui').classList.add('hidden'); 
+                document.getElementById('app-screen').classList.remove('hidden'); 
+                atualizarUI();
+                
                 if(status === 'sucesso') window.mostrarModal('Vitória!', `Você sacou em <b style="color: #00e676;">${multiplicador.toFixed(2)}x</b><br>e faturou <b>R$ ${lucro.toFixed(2)}</b>!`, 'sucesso');
                 else window.mostrarModal('Crash!', `Você bateu em <b style="color: #ff3333;">${multiplicador.toFixed(2)}x</b><br>e perdeu a aposta.`, 'erro');
             }, 250);
