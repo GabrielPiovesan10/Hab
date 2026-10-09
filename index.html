@@ -34,7 +34,7 @@
         body { 
             background-color: var(--bg-body); 
             color: var(--text-main); 
-            overflow: hidden; /* Trava o refresh da página no mobile */
+            overflow: hidden; 
             overscroll-behavior: none; 
             transition: background-color 0.3s; 
         }
@@ -67,14 +67,17 @@
         /* ================= TELA DE LOGIN & REGISTRO ================= */
         #login-screen { 
             position: absolute; top: 0; left: 0; width: 100vw; height: 100dvh; 
-            display: flex; justify-content: center; align-items: center; z-index: 50; 
-            background: var(--bg-body); padding: 20px;
-            overflow-y: auto; touch-action: auto; /* Permite scroll no celular */
+            display: flex; justify-content: center; /* Removido align-items: center para não cortar o topo no celular */
+            z-index: 50; background: var(--bg-body); padding: 40px 20px;
+            overflow-y: auto; touch-action: auto; 
+            -webkit-overflow-scrolling: touch; /* Scroll suave de momentum no iOS/Android */
+            overscroll-behavior-y: contain; /* Evita o puxar-para-atualizar da página inteira */
         }
 
         .auth-container {
             width: 100%; max-width: 400px;
-            margin: auto; /* Centraliza mesmo com scroll */
+            margin: auto; /* Centraliza verticalmente apenas quando a tela for maior que o conteúdo */
+            flex-shrink: 0; /* Impede a caixa de ser esmagada */
         }
 
         .auth-box {
@@ -95,7 +98,6 @@
         .sidebar-menu li:active { background: var(--border-main); }
         .sidebar-menu li i { color: #00e676; font-size: 20px; width: 25px; text-align: center; }
 
-        /* Correção específica do E-mail no Perfil */
         .profile-li { align-items: center !important; }
         .profile-info { display: flex; flex-direction: column; width: calc(100% - 40px); overflow: hidden; }
         .profile-title { font-size: 16px; font-weight: 600; }
@@ -104,7 +106,7 @@
         /* ================= MODAIS ================= */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: var(--modal-overlay); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 1100; opacity: 0; pointer-events: none; transition: 0.3s ease; }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
-        .modal-box { background: var(--bg-card); padding: 30px 25px; border-radius: 24px; width: 88%; max-width: 380px; text-align: center; position: relative; border: 1px solid var(--border-main); box-shadow: 0 20px 50px rgba(0,0,0,0.3); transform: translateY(20px); transition: 0.3s; max-height: 90dvh; overflow-y: auto; touch-action: auto; color: var(--text-main); }
+        .modal-box { background: var(--bg-card); padding: 30px 25px; border-radius: 24px; width: 88%; max-width: 380px; text-align: center; position: relative; border: 1px solid var(--border-main); box-shadow: 0 20px 50px rgba(0,0,0,0.3); transform: translateY(20px); transition: 0.3s; max-height: 90dvh; overflow-y: auto; touch-action: auto; -webkit-overflow-scrolling: touch; color: var(--text-main); }
         .modal-overlay.active .modal-box { transform: translateY(0); }
         
         .welcome-header { font-size: 50px; color: #00e676; margin-bottom: 15px; }
@@ -122,7 +124,8 @@
         .balance-badge { background: var(--input-bg); color: #00e676; padding: 8px 14px; border-radius: 20px; font-weight: 800; font-size: 14px; border: 1px solid var(--border-solid); display: flex; align-items: center; gap: 8px; cursor: pointer; }
 
         .tab-content { 
-            flex: 1; overflow-y: auto; touch-action: auto; /* Permite scroll nas abas */
+            flex: 1; overflow-y: auto; touch-action: auto; 
+            -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain;
             padding: 20px; padding-bottom: 120px; display: none; 
         }
         .tab-content.active { display: block; animation: fadeUp 0.4s ease; }
@@ -161,7 +164,6 @@
         .rank-user { flex: 1; margin-left: 15px; font-weight: 700; font-size: 15px; }
         .rank-score { font-weight: 900; color: #00e676; font-size: 16px; background: rgba(0,230,118,0.1); padding: 5px 12px; border-radius: 10px; }
 
-        /* Textos e Aviso de PIX Restaurados */
         .trust-notice { background: var(--trust-bg); border: 1px solid var(--trust-border); padding: 20px; border-radius: 16px; margin-bottom: 25px; text-align: left; display: flex; gap: 15px; align-items: flex-start; }
         .trust-notice i { color: #f59e0b; font-size: 22px; margin-top: 3px; }
         .trust-notice h4 { color: #d97706; font-size: 15px; margin-bottom: 8px; font-weight: 800; }
@@ -178,7 +180,7 @@
         /* ================= HUD DO JOGO ================= */
         #game-container { 
             position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; 
-            touch-action: none; /* Apenas o jogo bloqueia o scroll */
+            touch-action: none; /* Mantém o bloqueio de scroll somente na tela do jogo 3D */
         }
         #game-ui { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 5; }
         #top-ui { position: absolute; top: max(8vh, env(safe-area-inset-top)); left: 0; width: 100%; text-align: center; }
@@ -213,7 +215,6 @@
             <button class="btn-icon" onclick="window.fecharMenu()" style="border: none;"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <ul class="sidebar-menu">
-            <!-- Layout do E-mail Corrigido -->
             <li class="profile-li">
                 <i class="fa-solid fa-user"></i>
                 <div class="profile-info">
@@ -228,7 +229,7 @@
         </ul>
     </div>
 
-    <!-- MODAL DE REGRAS (Textos Restaurados) -->
+    <!-- MODAL DE REGRAS -->
     <div id="welcome-modal" class="modal-overlay">
         <div class="modal-box">
             <div class="welcome-header"><i class="fa-solid fa-shield-halved"></i></div>
@@ -264,7 +265,7 @@
         </div>
     </div>
 
-    <!-- TELA DE LOGIN & REGISTRO (Caixas separadas e limpas) -->
+    <!-- TELA DE LOGIN & REGISTRO -->
     <div id="login-screen" class="screen">
         <div class="auth-container">
             <h2 style="font-size: 40px; margin-bottom: 5px; font-weight: 900; letter-spacing: -1px; text-align: center;">GP <span>Games</span></h2>
@@ -285,7 +286,7 @@
                 </div>
             </div>
 
-            <!-- CAIXA DE REGISTRO (Oculta no início) -->
+            <!-- CAIXA DE REGISTRO -->
             <div id="form-registro" class="auth-box hidden">
                 <h3 style="margin-bottom: 20px; font-size: 20px; font-weight: 800;">Criar Nova Conta</h3>
                 
@@ -364,7 +365,6 @@
             <h2 style="font-size: 24px; font-weight: 900; margin-bottom: 10px;">Depositar</h2>
             <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 25px;">Adicione fundos para começar a jogar.</p>
             
-            <!-- Texto Restaurado -->
             <div class="trust-notice">
                 <i class="fa-solid fa-circle-info"></i>
                 <div>
@@ -449,7 +449,6 @@
             const loginBox = document.getElementById('form-login');
             const regBox = document.getElementById('form-registro');
             
-            // Faz um pequeno scroll para o topo se a tela for pequena
             document.getElementById('login-screen').scrollTo({ top: 0, behavior: 'smooth' });
 
             if(tela === 'registro') {
@@ -471,7 +470,6 @@
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('welcome-modal').classList.add('active');
                 
-                // Limpa os campos
                 document.getElementById('email-login').value = ""; document.getElementById('senha-login').value = "";
                 document.getElementById('email-registro').value = ""; document.getElementById('senha-registro').value = "";
             } else {
@@ -479,7 +477,7 @@
                 document.getElementById('login-screen').classList.remove('hidden');
                 document.getElementById('app-screen').classList.add('hidden');
                 document.getElementById('welcome-modal').classList.remove('active');
-                window.alternarTelasAuth('login'); // Garante que volta pra aba de login
+                window.alternarTelasAuth('login');
             }
         });
 
@@ -517,7 +515,6 @@
                         email: email, saldo: 0.00, recorde: 1.00
                     });
                 } catch (fsError) {
-                    // Erro silenciado para não assustar o usuário (se faltar regra no Firebase)
                     console.warn("Conta Auth criada. Erro ao configurar doc inicial no Firestore.", fsError);
                 }
             } catch (error) {
@@ -619,7 +616,7 @@
             document.getElementById('saque-input').value = ''; document.getElementById('chave-pix').value = '';
         };
 
-        // ================= MOTOR DO JOGO (INTACTO) =================
+        // ================= MOTOR DO JOGO =================
         window.iniciarJogo = async function() {
             let input = document.getElementById('bet-input'); window.formatarDinheiro(input); valorAposta = parseFloat(input.value);
             if(isNaN(valorAposta) || valorAposta < 2) return window.mostrarModal('Aviso', 'A entrada mínima é de R$ 2,00', 'aviso');
